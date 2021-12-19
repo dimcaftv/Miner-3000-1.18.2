@@ -1,8 +1,5 @@
 package yan.lx.bedrockminer.utils;
 
-//import net.fabricmc.fabric.api.event.client.player.ClientPickBlockCallback;
-//import net.minecraft.client.MinecraftClient;
-
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.client.MinecraftClient;
@@ -12,7 +9,6 @@ import net.minecraft.entity.effect.StatusEffectUtil;
 import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.item.Item;
 import net.minecraft.item.ItemConvertible;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.packet.c2s.play.UpdateSelectedSlotC2SPacket;
@@ -114,29 +110,36 @@ public class InventoryManager {
     public static int getInventoryItemCount(ItemConvertible item) {
         MinecraftClient minecraftClient = MinecraftClient.getInstance();
         PlayerInventory playerInventory = minecraftClient.player.getInventory();
-        return playerInventory.count((Item) item);
+        int counter = 0;
+
+        for (int i = 0; i < playerInventory.size(); i++) {
+            if (playerInventory.getStack(i).getItem() == new ItemStack(item).getItem()) {
+                counter = counter + playerInventory.getStack(i).getCount();
+            }
+        }
+        return counter;
     }
 
     public static String warningMessage() {
         MinecraftClient minecraftClient = MinecraftClient.getInstance();
         if (!"survival".equals(minecraftClient.interactionManager.getCurrentGameMode().getName())) {
-            return "bedrockminer.fail.missing.survival";
+            return "Survival Only.";
         }
 
         if (InventoryManager.getInventoryItemCount(Blocks.PISTON) < 2) {
-            return "bedrockminer.fail.missing.piston";
+            return "Needs more pistons.";
         }
 
         if (InventoryManager.getInventoryItemCount(Blocks.REDSTONE_TORCH) < 1) {
-            return "bedrockminer.fail.missing.redstonetorch";
+            return "Needs more redstone torches.";
         }
 
         if (InventoryManager.getInventoryItemCount(Blocks.SLIME_BLOCK)<1){
-            return "bedrockminer.fail.missing.slime";
+            return "Needs more slime blocks.";
         }
 
         if (!InventoryManager.canInstantlyMinePiston()) {
-            return "bedrockminer.fail.missing.instantmine";
+            return "Can't instantly mine piston.";
         }
         return null;
     }
