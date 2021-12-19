@@ -1,19 +1,11 @@
 package yan.lx.bedrockminer.utils;
 
-import net.minecraft.block.Blocks;
 import net.minecraft.client.MinecraftClient;
-//import net.minecraft.client.network.ClientPlayerEntity;
-//import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
-//import net.minecraft.item.Items;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.client.world.ClientWorld;
-//import net.minecraft.util.math.Position;
-//import net.minecraft.util.math.Vec3d;
-//import net.minecraft.util.math.Vec3i;
 
 import java.util.ArrayList;
-//import java.util.List;
 
 public class BreakingFlowController {
     private static ArrayList<TargetBlock> cachedTargetBlockList = new ArrayList<>();
@@ -24,13 +16,10 @@ public class BreakingFlowController {
 
     private static boolean working = false;
 
-    static {
-
-    }
 
     public static void addBlockPosToList(BlockPos pos) {
         ClientWorld world = MinecraftClient.getInstance().world;
-        if (world.getBlockState(pos).isOf(Blocks.BEDROCK)) {
+        if (world.getBlockState(pos).getHardness(world, pos) < 0) {
             MinecraftClient minecraftClient = MinecraftClient.getInstance();
 
             String haveEnoughItems = InventoryManager.warningMessage();
@@ -42,12 +31,10 @@ public class BreakingFlowController {
             if (shouldAddNewTargetBlock(pos)){
                 TargetBlock targetBlock = new TargetBlock(pos, world);
                 cachedTargetBlockList.add(targetBlock);
-                //Suggest also an english version, for debug reasons.
-                System.out.println("新任务");
+                System.out.println("new task.");
             }
         } else {
-            //Does not Have an english version, Left out of lang for now. (raw To prevent Errors)
-            Messager.rawactionBar("请确保敲击的方块还是基岩！");
+            Messager.actionBar("Please make sure the block you hit is still a valid block.");
         }
     }
 
@@ -65,7 +52,7 @@ public class BreakingFlowController {
         for (int i = 0; i < cachedTargetBlockList.size(); i++) {
             TargetBlock selectedBlock = cachedTargetBlockList.get(i);
 
-            //玩家切换世界，或离目标方块太远时，删除所有缓存的任务
+            //When the player switches worlds or is too far away from the target block, delete all cached tasks
             if (selectedBlock.getWorld() != MinecraftClient.getInstance().world ) {
                 cachedTargetBlockList = new ArrayList<TargetBlock>();
                 break;
@@ -89,10 +76,6 @@ public class BreakingFlowController {
         return (blockPos.getSquaredDistance(player.getPos(), true) <= range * range);
     }
 
-    public static WorkingMode getWorkingMode() {
-        return WorkingMode.VANILLA;
-    }
-
     private static boolean shouldAddNewTargetBlock(BlockPos pos){
         for (int i = 0; i < cachedTargetBlockList.size(); i++) {
             if (cachedTargetBlockList.get(i).getBlockPos().getSquaredDistance(pos.getX(),pos.getY(),pos.getZ(),false) == 0){
@@ -104,27 +87,16 @@ public class BreakingFlowController {
 
     public static void switchOnOff(){
         if (working){
-            Messager.chat("bedrockminer.toggle.off");
-
+            Messager.chat("");
+            Messager.chat("§5Unminable Miner stopped.§r");
+            Messager.chat("");
             working = false;
         } else {
-            Messager.chat("bedrockminer.toggle.on");
-
+            Messager.chat("");
+            Messager.chat("§5Unmineable Miner started. Left click an unminable block to break it.§r");
+            Messager.chat("");
             MinecraftClient minecraftClient = MinecraftClient.getInstance();
-            if (!minecraftClient.isInSingleplayer()){
-
-                Messager.chat("bedrockminer.warn.multiplayer");
-            }
             working = true;
         }
-    }
-
-
-    //测试用的。使用原版模式已经足以满足大多数需求。
-    //just for test. The VANILLA mode is powerful enough.
-    enum WorkingMode {
-        CARPET_EXTRA,
-        VANILLA,
-        MANUALLY;
     }
 }
