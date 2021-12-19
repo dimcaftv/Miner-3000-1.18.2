@@ -21,7 +21,6 @@ public class BlockPlacer {
 
         InventoryManager.switchToItem(item);
         BlockHitResult hitResult = new BlockHitResult(new Vec3d(pos.getX(), pos.getY(), pos.getZ()), Direction.UP, pos, false);
-//        minecraftClient.interactionManager.interactBlock(minecraftClient.player, minecraftClient.world, Hand.MAIN_HAND, hitResult);
         placeBlockWithoutInteractingBlock(minecraftClient, hitResult);
     }
 
@@ -29,11 +28,7 @@ public class BlockPlacer {
         MinecraftClient minecraftClient = MinecraftClient.getInstance();
         double x = pos.getX();
 
-        switch (BreakingFlowController.getWorkingMode()) {
-            case CARPET_EXTRA://carpet accurateBlockPlacement支持
-                x = x + 2 + direction.getId() * 2;
-                break;
-            case VANILLA://直接发包，改变服务端玩家实体视角
+        //Directly issue the packet to change the perspective of the player entity on the server side
                 PlayerEntity player = minecraftClient.player;
                 float pitch;
                 switch (direction) {
@@ -49,14 +44,11 @@ public class BlockPlacer {
                 }
 
                 minecraftClient.getNetworkHandler().sendPacket(new PlayerMoveC2SPacket.LookAndOnGround(player.getYaw(1.0f), pitch, player.isOnGround()));
-                break;
-        }
 
         Vec3d vec3d = new Vec3d(x, pos.getY(), pos.getZ());
 
         InventoryManager.switchToItem(Blocks.PISTON);
         BlockHitResult hitResult = new BlockHitResult(vec3d, Direction.UP, pos, false);
-//        minecraftClient.interactionManager.interactBlock(minecraftClient.player, minecraftClient.world, Hand.MAIN_HAND, hitResult);
         placeBlockWithoutInteractingBlock(minecraftClient, hitResult);
     }
 
