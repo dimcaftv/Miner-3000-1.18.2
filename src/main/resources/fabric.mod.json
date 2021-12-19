@@ -1,16 +1,17 @@
 {
   "schemaVersion": 1,
-  "id": "bedrockminer",
+  "id": "unmineableminer",
   "version": "1.0.0",
 
-  "name": "Bedrock Miner",
-  "description": "Client mod to mine bedrock!",
+  "name": "Unminable Miner",
+  "description": "Mod for mining Unmineables.",
   "authors": [
-    "LXYan"
+    "LXYan",
+    "thebest9178"
   ],
   "contact": {
-    "homepage": "https://github.com/LXYan2333/Fabric-Bedrock-Miner",
-    "sources": "https://github.com/LXYan2333/Fabric-Bedrock-Miner"
+    "homepage": "https://github.com/thebest9178/Unminable-Miner",
+    "sources": "https://github.com/thebest9178/Unminable-Miner"
   },
 
   "license": "",
@@ -27,8 +28,8 @@
 
   "depends": {
     "fabricloader": ">=0.11.3",
-    "minecraft": "1.16.x",
-    "java": ">=8"
+    "minecraft": "1.17.x",
+    "java": ">=16"
   },
   "suggests": {
     "another-mod": "*"
