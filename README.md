@@ -1,7 +1,5 @@
-**English** | [中文](https://github.com/LXYan2333/Fabric-Bedrock-Miner/blob/main/README_中文.md)
-
-# Fabric-Bedrock-Miner
-A Fabric client mod to "mine" bedrock!
+# Unminable-Miner
+A Fabric client mod to "mine" unminable blocks.
 
 # Showcase
 https://www.youtube.com/watch?v=b8Y86yxjr_Y  
@@ -15,11 +13,8 @@ Have the following items ready:
 4. Redstone torches
 5. Slime blocks
 
-Right click bedrock **with an empty hand** to switch on/off.
+Right click any unminable block **with an empty hand** to switch on/off.
 
-While the mod is enabled, left click bedrock to "mine" it.
+While the mod is enabled, left click an unminable block to "mine" it.
 
-If my mod saves you tons of time, please considering leave me a star.
-
-# Compile
-Checkout to the corresponding Minecraft version and compile following the Fabric wiki.
+Requires allow-permanent-block-break-exploits and allow-headless-pistons to be true for paper servers
