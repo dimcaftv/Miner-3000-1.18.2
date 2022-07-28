@@ -19,7 +19,7 @@ public class BreakingFlowController {
 
     public static void addBlockPosToList(BlockPos pos) {
         ClientWorld world = MinecraftClient.getInstance().world;
-        if (world.getBlockState(pos).getHardness(world, pos) < 0) {
+        if (!world.getBlockState(pos).isAir()) {
             MinecraftClient minecraftClient = MinecraftClient.getInstance();
 
             String haveEnoughItems = InventoryManager.warningMessage();
@@ -73,12 +73,12 @@ public class BreakingFlowController {
     }
 
     private static boolean blockInPlayerRange(BlockPos blockPos, PlayerEntity player, float range) {
-        return (blockPos.getSquaredDistance(player.getPos(), true) <= range * range);
+        return blockPos.isWithinDistance(player.getPos(), range);
     }
 
     private static boolean shouldAddNewTargetBlock(BlockPos pos){
         for (int i = 0; i < cachedTargetBlockList.size(); i++) {
-            if (cachedTargetBlockList.get(i).getBlockPos().getSquaredDistance(pos.getX(),pos.getY(),pos.getZ(),false) == 0){
+            if (cachedTargetBlockList.get(i).getBlockPos().getManhattanDistance(pos) == 0){
                 return false;
             }
         }
