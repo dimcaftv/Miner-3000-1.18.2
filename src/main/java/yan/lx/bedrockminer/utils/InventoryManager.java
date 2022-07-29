@@ -114,7 +114,7 @@ public class InventoryManager {
 
         for (int i = 0; i < playerInventory.size(); i++) {
             if (playerInventory.getStack(i).getItem() == new ItemStack(item).getItem()) {
-                counter = counter + playerInventory.getStack(i).getCount();
+                counter += playerInventory.getStack(i).getCount();
             }
         }
         return counter;
@@ -134,7 +134,7 @@ public class InventoryManager {
             return "Needs more redstone torches.";
         }
 
-        if (InventoryManager.getInventoryItemCount(Blocks.SLIME_BLOCK)<1){
+        if (InventoryManager.getInventoryItemCount(Blocks.SLIME_BLOCK) < 1){
             return "Needs more slime blocks.";
         }
 
