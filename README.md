@@ -1,4 +1,4 @@
-# Unminable-Miner
+# Miner-3000
 A Fabric client mod to "mine" all blocks.
 
 # Showcase
