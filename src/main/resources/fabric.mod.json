@@ -3,16 +3,16 @@
   "id": "unmineableminer",
   "version": "1.0.0",
 
-  "name": "Unminable Miner",
-  "description": "Mod for mining Unmineables.",
+  "name": "Miner-3000",
+  "description": "Mod for mining everything.",
   "authors": [
     "LXYan",
     "thebest9178",
     "dimcaftv"
   ],
   "contact": {
-    "homepage": "https://github.com/dimcaftv/Unminable-Miner-1.18.2",
-    "sources": "https://github.com/dimcaftv/Unminable-Miner-1.18.2"
+    "homepage": "https://github.com/dimcaftv/Miner-3000-1.18.2",
+    "sources": "https://github.com/dimcaftv/Miner-3000-1.18.2"
   },
 
   "license": "",
