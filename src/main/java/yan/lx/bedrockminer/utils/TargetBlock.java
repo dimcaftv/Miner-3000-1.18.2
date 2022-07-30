@@ -30,10 +30,10 @@ public class TargetBlock {
         this.pistonBlockPos = pos.offset(dir);
         this.redstoneTorchBlockPos = CheckingEnvironment.findNearbyFlatBlockToPlaceRedstoneTorch(this.world, this.blockPos, placeDir);
         if (redstoneTorchBlockPos == null) {
-            this.slimeBlockPos = CheckingEnvironment.findPossibleSlimeBlockPos(world, pos);
+            this.slimeBlockPos = CheckingEnvironment.findPossibleSlimeBlockPos(world, pos, placeDir);
             if (slimeBlockPos != null) {
                 BlockPlacer.simpleBlockPlacement(slimeBlockPos, Blocks.SLIME_BLOCK);
-                redstoneTorchBlockPos = slimeBlockPos.up();
+                redstoneTorchBlockPos = CheckingEnvironment.findNearbyFlatBlockToPlaceRedstoneTorch(this.world, this.blockPos, placeDir);
             } else {
                 this.status = Status.FAILED;
             }
@@ -47,7 +47,7 @@ public class TargetBlock {
         switch (this.status) {
             case UNINITIALIZED:
                 InventoryManager.switchToItem(Blocks.PISTON);
-                BlockPlacer.pistonPlacement(this.pistonBlockPos, Direction.UP);
+                BlockPlacer.pistonPlacement(this.pistonBlockPos, placeDir);
                 InventoryManager.switchToItem(Blocks.REDSTONE_TORCH);
                 BlockPlacer.simpleBlockPlacement(this.redstoneTorchBlockPos, Blocks.REDSTONE_TORCH);
                 break;
@@ -123,7 +123,7 @@ public class TargetBlock {
         }
         this.redstoneTorchBlockPos = CheckingEnvironment.findNearbyFlatBlockToPlaceRedstoneTorch(this.world, this.blockPos, placeDir);
         if (this.redstoneTorchBlockPos == null) {
-            this.slimeBlockPos = CheckingEnvironment.findPossibleSlimeBlockPos(world, blockPos);
+            this.slimeBlockPos = CheckingEnvironment.findPossibleSlimeBlockPos(world, blockPos, placeDir);
             if (slimeBlockPos != null) {
                 BlockPlacer.simpleBlockPlacement(slimeBlockPos, Blocks.SLIME_BLOCK);
                 redstoneTorchBlockPos = slimeBlockPos.up();
