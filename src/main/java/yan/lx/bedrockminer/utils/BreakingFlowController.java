@@ -88,12 +88,12 @@ public class BreakingFlowController {
     public static void switchOnOff(){
         if (working){
             Messager.chat("");
-            Messager.chat("§5Unminable Miner stopped.§r");
+            Messager.chat("§5Miner-3000 stopped.§r");
             Messager.chat("");
             working = false;
         } else {
             Messager.chat("");
-            Messager.chat("§5Unmineable Miner started. Left click an unminable block to break it.§r");
+            Messager.chat("§5Miner-3000 started. Left click a block to break it.§r");
             Messager.chat("");
             MinecraftClient minecraftClient = MinecraftClient.getInstance();
             working = true;
