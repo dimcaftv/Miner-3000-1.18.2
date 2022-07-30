@@ -48,7 +48,7 @@ public class MinecraftClientMixin {
     @Inject(method = "handleBlockBreaking", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/network/ClientPlayerEntity;swingHand(Lnet/minecraft/util/Hand;)V"), locals = LocalCapture.CAPTURE_FAILSOFT)
     private void inject(boolean bl, CallbackInfo ci, BlockHitResult blockHitResult, BlockPos blockPos, Direction direction) {
         if (!world.getBlockState(blockPos).isAir() && !world.getBlockState(blockHitResult.getBlockPos()).isOf(Blocks.NETHER_PORTAL) && BreakingFlowController.isWorking()) {
-            BreakingFlowController.addBlockPosToList(blockPos);
+            BreakingFlowController.addBlockPosToList(blockPos, direction);
         }
     }
 }

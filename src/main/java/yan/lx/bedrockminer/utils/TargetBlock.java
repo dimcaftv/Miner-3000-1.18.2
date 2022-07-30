@@ -18,15 +18,17 @@ public class TargetBlock {
     private int tickTimes;
     private boolean hasTried;
     private int stuckTicksCounter;
+    private Direction placeDir;
 
-    public TargetBlock(BlockPos pos, ClientWorld world) {
+    public TargetBlock(BlockPos pos, ClientWorld world, Direction dir) {
+        placeDir = dir;
         this.hasTried = false;
         this.stuckTicksCounter = 0;
         this.status = Status.UNINITIALIZED;
         this.blockPos = pos;
         this.world = world;
-        this.pistonBlockPos = pos.up();
-        this.redstoneTorchBlockPos = CheckingEnvironment.findNearbyFlatBlockToPlaceRedstoneTorch(this.world, this.blockPos);
+        this.pistonBlockPos = pos.offset(dir);
+        this.redstoneTorchBlockPos = CheckingEnvironment.findNearbyFlatBlockToPlaceRedstoneTorch(this.world, this.blockPos, placeDir);
         if (redstoneTorchBlockPos == null) {
             this.slimeBlockPos = CheckingEnvironment.findPossibleSlimeBlockPos(world, pos);
             if (slimeBlockPos != null) {
@@ -119,7 +121,7 @@ public class TargetBlock {
             this.status = Status.FAILED;
             return;
         }
-        this.redstoneTorchBlockPos = CheckingEnvironment.findNearbyFlatBlockToPlaceRedstoneTorch(this.world, this.blockPos);
+        this.redstoneTorchBlockPos = CheckingEnvironment.findNearbyFlatBlockToPlaceRedstoneTorch(this.world, this.blockPos, placeDir);
         if (this.redstoneTorchBlockPos == null) {
             this.slimeBlockPos = CheckingEnvironment.findPossibleSlimeBlockPos(world, blockPos);
             if (slimeBlockPos != null) {
