@@ -24,31 +24,53 @@ public class BlockPlacer {
         placeBlockWithoutInteractingBlock(minecraftClient, hitResult);
     }
 
-    public static void pistonPlacement(BlockPos pos, Direction direction) {
+    public static void advancedPlacement(BlockPos pos, Direction placeDirection, Direction blockSideDirection, ItemConvertible item) {
         MinecraftClient minecraftClient = MinecraftClient.getInstance();
         double x = pos.getX();
 
         //Directly issue the packet to change the perspective of the player entity on the server side
                 PlayerEntity player = minecraftClient.player;
                 float pitch;
-                switch (direction) {
+                float yaw;
+                switch (placeDirection) {
                     case UP:
                         pitch = 90f;
+                        yaw = 0f;
                         break;
                     case DOWN:
                         pitch = -90f;
+                        yaw = 0f;
+                        break;
+                    case EAST:
+                        pitch = 0f;
+                        yaw = 90f;
+                        break;
+                    case WEST:
+                        pitch = 0f;
+                        yaw = -90f;
+                        break;
+                    case NORTH:
+                        pitch = 0f;
+                        yaw = 0f;
+                        break;
+                    case SOUTH:
+                        pitch = 0f;
+                        yaw = -180f;
                         break;
                     default:
                         pitch = 90f;
+                        yaw = 0f;
                         break;
                 }
 
-                minecraftClient.getNetworkHandler().sendPacket(new PlayerMoveC2SPacket.LookAndOnGround(player.getYaw(1.0f), pitch, player.isOnGround()));
+                System.out.println(yaw + " " + pitch);
+
+                minecraftClient.getNetworkHandler().sendPacket(new PlayerMoveC2SPacket.LookAndOnGround(yaw, pitch, player.isOnGround()));
 
         Vec3d vec3d = new Vec3d(x, pos.getY(), pos.getZ());
 
-        InventoryManager.switchToItem(Blocks.PISTON);
-        BlockHitResult hitResult = new BlockHitResult(vec3d, Direction.UP, pos, false);
+        InventoryManager.switchToItem(item);
+        BlockHitResult hitResult = new BlockHitResult(vec3d, blockSideDirection, pos, false);
         placeBlockWithoutInteractingBlock(minecraftClient, hitResult);
     }
 

@@ -56,7 +56,7 @@ public class BreakingFlowController {
                 break;
             }
 
-            if (blockInPlayerRange(selectedBlock.getBlockPos(), player, 3.4f)) {
+            if (blockInPlayerRange(selectedBlock.getBlockPos(), player, 5f)) {
                 TargetBlock.Status status = cachedTargetBlockList.get(i).tick();
                 if (status == TargetBlock.Status.RETRACTING) {
                     continue;

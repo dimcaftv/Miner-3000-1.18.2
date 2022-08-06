@@ -47,9 +47,9 @@ public class TargetBlock {
         switch (this.status) {
             case UNINITIALIZED:
                 InventoryManager.switchToItem(Blocks.PISTON);
-                BlockPlacer.pistonPlacement(this.pistonBlockPos, placeDir);
+                BlockPlacer.advancedPlacement(pistonBlockPos, placeDir, placeDir, Blocks.PISTON);
                 InventoryManager.switchToItem(Blocks.REDSTONE_TORCH);
-                BlockPlacer.simpleBlockPlacement(this.redstoneTorchBlockPos, Blocks.REDSTONE_TORCH);
+                BlockPlacer.advancedPlacement(redstoneTorchBlockPos, Direction.UP, CheckingEnvironment.wherePlaceTorch(world,redstoneTorchBlockPos, placeDir), Blocks.REDSTONE_TORCH);
                 break;
             case UNEXTENDED_WITH_POWER_SOURCE:
                 break;
@@ -60,14 +60,14 @@ public class TargetBlock {
                     BlockBreaker.breakBlock(world, pos);
                 }
                 //Destroy out the piston
-                BlockBreaker.breakBlock(this.world, this.pistonBlockPos);
+                BlockBreaker.breakBlock(world, pistonBlockPos);
                 //Place the piston facing down
-                BlockPlacer.pistonPlacement(this.pistonBlockPos, Direction.DOWN);
-                this.hasTried = true;
+                BlockPlacer.advancedPlacement(pistonBlockPos, placeDir.getOpposite(), placeDir, Blocks.PISTON);
+                hasTried = true;
                 break;
             case RETRACTED:
                 BlockBreaker.breakBlock(world, pistonBlockPos);
-                BlockBreaker.breakBlock(world, pistonBlockPos.up());
+                BlockBreaker.breakBlock(world, pistonBlockPos.offset(placeDir));
                 if (this.slimeBlockPos != null) {
                     BlockBreaker.breakBlock(world, slimeBlockPos);
                 }
@@ -76,15 +76,15 @@ public class TargetBlock {
                 return Status.RETRACTING;
             case UNEXTENDED_WITHOUT_POWER_SOURCE:
                 InventoryManager.switchToItem(Blocks.REDSTONE_TORCH);
-                BlockPlacer.simpleBlockPlacement(this.redstoneTorchBlockPos, Blocks.REDSTONE_TORCH);
+                BlockPlacer.advancedPlacement(redstoneTorchBlockPos, Direction.UP, CheckingEnvironment.wherePlaceTorch(world,redstoneTorchBlockPos, placeDir), Blocks.REDSTONE_TORCH);
                 break;
             case FAILED:
                 BlockBreaker.breakBlock(world, pistonBlockPos);
-                BlockBreaker.breakBlock(world, pistonBlockPos.up());
+                BlockBreaker.breakBlock(world, pistonBlockPos.offset(placeDir));
                 return Status.FAILED;
             case STUCK:
                 BlockBreaker.breakBlock(world, pistonBlockPos);
-                BlockBreaker.breakBlock(world, pistonBlockPos.up());
+                BlockBreaker.breakBlock(world, pistonBlockPos.offset(placeDir));
                 break;
             case NEEDS_WAITING:
                 break;
@@ -126,7 +126,7 @@ public class TargetBlock {
             this.slimeBlockPos = CheckingEnvironment.findPossibleSlimeBlockPos(world, blockPos, placeDir);
             if (slimeBlockPos != null) {
                 BlockPlacer.simpleBlockPlacement(slimeBlockPos, Blocks.SLIME_BLOCK);
-                redstoneTorchBlockPos = slimeBlockPos.up();
+                redstoneTorchBlockPos = CheckingEnvironment.findNearbyFlatBlockToPlaceRedstoneTorch(this.world, this.blockPos, placeDir);
             } else {
                 this.status = Status.FAILED;
                 Messager.actionBar("Failed to place redstone torch.");
@@ -142,15 +142,15 @@ public class TargetBlock {
         } else if (this.hasTried && this.world.getBlockState(this.pistonBlockPos).isOf(Blocks.PISTON) && this.stuckTicksCounter < 15) {
             this.status = Status.NEEDS_WAITING;
             this.stuckTicksCounter++;
-        } else if (this.world.getBlockState(this.pistonBlockPos).isOf(Blocks.PISTON) && this.world.getBlockState(this.pistonBlockPos).get(PistonBlock.FACING) == Direction.DOWN && !this.world.getBlockState(this.pistonBlockPos).get(PistonBlock.EXTENDED) && CheckingEnvironment.findNearbyRedstoneTorch(this.world, this.pistonBlockPos).size() != 0 && !(this.world.getBlockState(this.blockPos).isAir())) {
+        } else if (this.world.getBlockState(this.pistonBlockPos).isOf(Blocks.PISTON) && this.world.getBlockState(this.pistonBlockPos).get(PistonBlock.FACING) == placeDir.getOpposite() && !this.world.getBlockState(this.pistonBlockPos).get(PistonBlock.EXTENDED) && CheckingEnvironment.findNearbyRedstoneTorch(this.world, this.pistonBlockPos).size() != 0 && !(this.world.getBlockState(this.blockPos).isAir())) {
             this.status = Status.STUCK;
             this.hasTried = false;
             this.stuckTicksCounter = 0;
-        } else if (this.world.getBlockState(this.pistonBlockPos).isOf(Blocks.PISTON) && !this.world.getBlockState(this.pistonBlockPos).get(PistonBlock.EXTENDED) && this.world.getBlockState(this.pistonBlockPos).get(PistonBlock.FACING) == Direction.UP && CheckingEnvironment.findNearbyRedstoneTorch(this.world, this.pistonBlockPos).size() == 0 && !(this.world.getBlockState(this.blockPos).isAir())) {
+        } else if (this.world.getBlockState(this.pistonBlockPos).isOf(Blocks.PISTON) && !this.world.getBlockState(this.pistonBlockPos).get(PistonBlock.EXTENDED) && this.world.getBlockState(this.pistonBlockPos).get(PistonBlock.FACING) == placeDir && CheckingEnvironment.findNearbyRedstoneTorch(this.world, this.pistonBlockPos).size() == 0 && !(this.world.getBlockState(this.blockPos).isAir())) {
             this.status = Status.UNEXTENDED_WITHOUT_POWER_SOURCE;
-        } else if (CheckingEnvironment.has2BlocksOfPlaceToPlacePiston(world, this.blockPos)) {
+        } else if (CheckingEnvironment.has2BlocksOfPlaceToPlacePiston(world, this.blockPos, placeDir)) {
             this.status = Status.UNINITIALIZED;
-        } else if (!CheckingEnvironment.has2BlocksOfPlaceToPlacePiston(world, this.blockPos)) {
+        } else if (!CheckingEnvironment.has2BlocksOfPlaceToPlacePiston(world, this.blockPos, placeDir)) {
             this.status = Status.FAILED;
             Messager.actionBar("Failed to place piston.");
         } else {
