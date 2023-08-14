@@ -1,12 +1,11 @@
 package yan.lx.bedrockminer.utils;
 
-import net.minecraft.block.Blocks;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemConvertible;
+import net.minecraft.item.ItemPlacementContext;
 import net.minecraft.item.ItemStack;
-import net.minecraft.item.ItemUsageContext;
 import net.minecraft.network.packet.c2s.play.PlayerInteractBlockC2SPacket;
 import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
 import net.minecraft.util.Hand;
@@ -24,53 +23,31 @@ public class BlockPlacer {
         placeBlockWithoutInteractingBlock(minecraftClient, hitResult);
     }
 
-    public static void advancedPlacement(BlockPos pos, Direction placeDirection, Direction blockSideDirection, ItemConvertible item) {
+    public static void advancedPlacement(BlockPos pos, Direction placeDirection, ItemConvertible item) {
         MinecraftClient minecraftClient = MinecraftClient.getInstance();
-        double x = pos.getX();
 
         //Directly issue the packet to change the perspective of the player entity on the server side
-                PlayerEntity player = minecraftClient.player;
-                float pitch;
-                float yaw;
-                switch (placeDirection) {
-                    case UP:
-                        pitch = 90f;
-                        yaw = 0f;
-                        break;
-                    case DOWN:
-                        pitch = -90f;
-                        yaw = 0f;
-                        break;
-                    case EAST:
-                        pitch = 0f;
-                        yaw = 90f;
-                        break;
-                    case WEST:
-                        pitch = 0f;
-                        yaw = -90f;
-                        break;
-                    case NORTH:
-                        pitch = 0f;
-                        yaw = 0f;
-                        break;
-                    case SOUTH:
-                        pitch = 0f;
-                        yaw = -180f;
-                        break;
-                    default:
-                        pitch = 90f;
-                        yaw = 0f;
-                        break;
-                }
+        PlayerEntity player = minecraftClient.player;
+        float pitch;
+        switch (placeDirection) {
+            case UP:
+                pitch = 90f;
+                break;
+            case DOWN:
+                pitch = -90f;
+                break;
+             default:
+                 pitch = 90f;
+                 break;
+        }
 
-                System.out.println(yaw + " " + pitch);
+        minecraftClient.getNetworkHandler().sendPacket(new PlayerMoveC2SPacket.LookAndOnGround(player.getYaw(1.0f), pitch, player.isOnGround()));
 
-                minecraftClient.getNetworkHandler().sendPacket(new PlayerMoveC2SPacket.LookAndOnGround(yaw, pitch, player.isOnGround()));
-
-        Vec3d vec3d = new Vec3d(x, pos.getY(), pos.getZ());
+        Vec3d vec3d = new Vec3d(pos.getX(), pos.getY(), pos.getZ());
 
         InventoryManager.switchToItem(item);
-        BlockHitResult hitResult = new BlockHitResult(vec3d, blockSideDirection, pos, false);
+        BlockHitResult hitResult = new BlockHitResult(vec3d, Direction.UP, pos, false);
+
         placeBlockWithoutInteractingBlock(minecraftClient, hitResult);
     }
 
@@ -78,11 +55,13 @@ public class BlockPlacer {
         ClientPlayerEntity player = minecraftClient.player;
         ItemStack itemStack = player.getStackInHand(Hand.MAIN_HAND);
 
-        minecraftClient.getNetworkHandler().sendPacket(new PlayerInteractBlockC2SPacket(Hand.MAIN_HAND, hitResult));
+        minecraftClient.getNetworkHandler().sendPacket(new PlayerInteractBlockC2SPacket(Hand.MAIN_HAND, hitResult, 10));
 
         if (!itemStack.isEmpty() && !player.getItemCooldownManager().isCoolingDown(itemStack.getItem())) {
-            ItemUsageContext itemUsageContext = new ItemUsageContext(player, Hand.MAIN_HAND, hitResult);
-            itemStack.useOnBlock(itemUsageContext);
+
+            //minecraftClient.interactionManager.interactBlock(player, minecraftClient.world, Hand.MAIN_HAND, hitResult);
+            ItemPlacementContext itemPlacementContext = new ItemPlacementContext(player, Hand.MAIN_HAND, itemStack, hitResult);
+            itemStack.useOnBlock(itemPlacementContext);
 
         }
     }

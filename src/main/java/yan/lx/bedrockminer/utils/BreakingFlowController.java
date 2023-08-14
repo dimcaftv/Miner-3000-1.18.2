@@ -18,21 +18,23 @@ public class BreakingFlowController {
     private static boolean working = false;
 
     public static void addBlockPosToList(BlockPos pos, Direction dir) {
-        ClientWorld world = MinecraftClient.getInstance().world;
-        if (!world.getBlockState(pos).isAir()) {
-            MinecraftClient minecraftClient = MinecraftClient.getInstance();
-            String haveEnoughItems = InventoryManager.warningMessage();
-            if (haveEnoughItems != null) {
-                Messager.actionBar(haveEnoughItems);
-                return;
+        if (dir == Direction.UP) {
+            ClientWorld world = MinecraftClient.getInstance().world;
+            if (!world.getBlockState(pos).isAir()) {
+                String haveEnoughItems = InventoryManager.warningMessage();
+                if (haveEnoughItems != null) {
+                    Messager.actionBar(haveEnoughItems);
+                    return;
+                }
+
+                if (shouldAddNewTargetBlock(pos)) {
+                    TargetBlock targetBlock = new TargetBlock(pos, world);
+                    cachedTargetBlockList.add(targetBlock);
+                    System.out.println("new task.");
+                }
+            } else {
+                Messager.actionBar("Please make sure the block you hit is still a valid block.");
             }
-            if (shouldAddNewTargetBlock(pos)){
-                TargetBlock targetBlock = new TargetBlock(pos, world, dir);
-                cachedTargetBlockList.add(targetBlock);
-                System.out.println("new task.");
-            }
-        } else {
-            Messager.actionBar("Please make sure the block you hit is still a valid block.");
         }
     }
 
@@ -52,7 +54,7 @@ public class BreakingFlowController {
 
             //When the player switches worlds or is too far away from the target block, delete all cached tasks
             if (selectedBlock.getWorld() != MinecraftClient.getInstance().world ) {
-                cachedTargetBlockList = new ArrayList<TargetBlock>();
+                cachedTargetBlockList = new ArrayList<>();
                 break;
             }
 
@@ -75,8 +77,8 @@ public class BreakingFlowController {
     }
 
     private static boolean shouldAddNewTargetBlock(BlockPos pos){
-        for (int i = 0; i < cachedTargetBlockList.size(); i++) {
-            if (cachedTargetBlockList.get(i).getBlockPos().getManhattanDistance(pos) == 0){
+        for (TargetBlock targetBlock : cachedTargetBlockList) {
+            if (targetBlock.getBlockPos().getManhattanDistance(pos) == 0) {
                 return false;
             }
         }
@@ -93,7 +95,6 @@ public class BreakingFlowController {
             Messager.chat("");
             Messager.chat("§5Miner-3000 started. Left click a block to break it.§r");
             Messager.chat("");
-            MinecraftClient minecraftClient = MinecraftClient.getInstance();
             working = true;
         }
     }
